@@ -1,0 +1,8 @@
+compose:
+  _traget_: albumentations.Compose
+  _recursive_: true
+  transforms:
+  - _target_: albumentations.Rotate
+    limit: 10
+  - _target_: albumentations.ToGray
+    p: 1

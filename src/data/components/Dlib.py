@@ -20,13 +20,11 @@ class Dlib(Dataset):
     """Face keypoints dataset."""
 
 
-    def __init__(self, root_dir= r'data\IBUG\ibug_300W_large_face_landmark_dataset', transform=None):
+    def __init__(self, root_dir= r'data\IBUG\ibug_300W_large_face_landmark_dataset'):
         """
         Arguments:
             xml_file (string): Path to the xml file with annotations.
             root_dir (string): Directory with all the images.
-            transform (callable, optional): Optional transform to be applied
-                on a sample.
         """
         xml_path = r'data\IBUG\ibug_300W_large_face_landmark_dataset\labels_ibug_300W.xml'
         #Download the damn file from the net bro
@@ -41,7 +39,6 @@ class Dlib(Dataset):
 
             #change dis code
             self.root_dir = root_dir
-            self.transform = transform
 
     def __len__(self):
         return len(self.root[2])
@@ -84,64 +81,32 @@ class Dlib(Dataset):
         return sample
 
 
-
-    def show_keypoints(self, idx):
-
-        if torch.is_tensor(idx):
-            idx = idx.tolist()
+    @staticmethod
+    def show_keypoints(image, keypoints):
         
-        img_name = os.path.join(self.root_dir,
-                                self.root[2][idx].attrib['file'])
-        image = Image.open(img_name)
-
-        keypoints = []
-        for kp in self.root[2][idx][0].iter():
-            keypoints.append([kp.attrib.get('x'), kp.attrib.get('y')])
-
-        keypoints = keypoints[1:]
-        keypoints = np.array(keypoints, dtype=float)
-
-        plt.imshow(image)
+        plt.imshow(image.permute(1, 2, 0) )
         plt.scatter(keypoints[:,0], keypoints[:,1], marker='.', c='r')
         plt.savefig('landmarkdrawers.png')
 
-
-    def show_boundingboxes(self, idx):
-
-        
-        img_name = os.path.join(self.root_dir,
-                            self.root[2][idx].attrib['file'])
-        image = Image.open(img_name)
-
-        box_dict = self.root[2][idx][0].attrib
-
-        box = [box_dict.get('left'), box_dict.get('top'), 
-                float(box_dict.get('left'))+float(box_dict.get('width')), 
-                float(box_dict.get('top')) + float(box_dict.get('height'))]
-        box = np.array(box, dtype=float)
-
-        keypoints = []
-        for kp in self.root[2][idx][0].iter():
-            keypoints.append([kp.attrib.get('x'), kp.attrib.get('y')])
-
-        keypoints = keypoints[1:]
-        keypoints = np.array(keypoints, dtype=float)
+    @staticmethod
+    def show_boundingboxes(image, keypoints, box):
 
         plt.scatter(keypoints[:,0], keypoints[:,1], marker='.', c='r')
 
+        box_width, box_height = 244
 
         # Get the current reference
         ax = plt.gca()
 
         # Create a Rectangle patch
         rect = Rectangle( (box[0],box[1] )
-                            ,float(box_dict.get('width')), float(box_dict.get('height')) ,linewidth=1,edgecolor='r',facecolor='none')
+                            , box_width, box_height ,linewidth=1,edgecolor='r',facecolor='none')
 
         # Add the patch to the Axes
         ax.add_patch(rect)
 
 
-        plt.imshow(image)
+        plt.imshow(image.permute(1, 2, 0) )
         plt.savefig('bbdrawers.png')
 
 
@@ -165,7 +130,6 @@ def unzip_data():
                 zip_ref.extract(member, 'data')
             except zipfile.error as e:
                 pass
-
 
 
 

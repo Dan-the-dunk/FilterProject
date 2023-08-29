@@ -1,0 +1,9 @@
+_target_: src.data.DlibModule.DlibModule
+data_dir: ${paths.data_dir}
+batch_size: 32
+train_val_test_split:
+- 792
+- 72
+- 114
+num_workers: 0
+pin_memory: false

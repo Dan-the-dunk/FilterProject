@@ -1,0 +1,9 @@
+class: path:'./Dlib.py'
+compose:
+  _target_: albumentations.Compose
+  _recursive_: true
+  transforms:
+  - _target_: albumentations.Rotate
+    limit: 30
+  - _target_: albumentations.ToGray
+    p: 1

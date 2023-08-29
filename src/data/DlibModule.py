@@ -43,7 +43,7 @@ class DlibDataModule(LightningDataModule):
         self,
         data_dir: str = "data/",
         train_val_test_split: Tuple[int, int, int] = (792, 72, 114),
-        batch_size: int = 64,
+        batch_size: int = 32,
         num_workers: int = 0,
         pin_memory: bool = False,
     ):
