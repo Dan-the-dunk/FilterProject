@@ -83,9 +83,8 @@ class Dlib(Dataset):
 
     @staticmethod
     def show_keypoints(image, keypoints):
-        
-        plt.imshow(image.permute(1, 2, 0) )
-        plt.scatter(keypoints[:,0], keypoints[:,1], marker='.', c='r')
+        plt.imshow((image.permute(1,2,0)))
+        plt.scatter(keypoints[:,0] * 224, keypoints[:,1] * 224, marker='.', c='r')
         plt.savefig('landmarkdrawers.png')
 
     @staticmethod
@@ -105,9 +104,32 @@ class Dlib(Dataset):
         # Add the patch to the Axes
         ax.add_patch(rect)
 
-
-        plt.imshow(image.permute(1, 2, 0) )
+        plt.imshow(denormalize(image))
         plt.savefig('bbdrawers.png')
+
+    @staticmethod
+    def testImage(image):
+        t = image.clone().permute(1, 2, 0)
+        print(f"Max: {torch.max(t)}, Min: {torch.min(t)}")
+
+
+
+IMG_MEAN = [0.485, 0.456, 0.406] 
+IMG_STD = [0.229, 0.224, 0.225]
+def denormalize(x, mean=IMG_MEAN, std=IMG_STD) -> torch. Tensor:
+# IN: 3, H, W
+    ten = x.clone().permute(1, 2, 0)
+    for t, m, s in zip(ten, mean, std):
+        t.mul_(s).add_(m)
+    
+
+    print(f"Max: {torch.max(t)}, Min: {torch.min(t)}")
+    # B, 3, H, W
+    return ten 
+
+
+
+
 
 
 def download_data():

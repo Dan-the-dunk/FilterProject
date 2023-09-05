@@ -1,0 +1,2 @@
+train_transform:
+  _target_: configs.data.train_transform.default.yaml

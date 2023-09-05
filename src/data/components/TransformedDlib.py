@@ -3,11 +3,13 @@ import hydra
 from matplotlib import pyplot as plt
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
-from Dlib import Dlib
+from .Dlib import Dlib
 from typing import Optional
 from albumentations.pytorch import ToTensorV2
 
 
+WIDTH = 224
+LENGTH = 244
 
 class TransformedDlib(Dataset):
     
@@ -33,25 +35,28 @@ class TransformedDlib(Dataset):
      
         transformed = self.transform(image= np.array(self.pre_dataset[idx]['image']), keypoints=self.pre_dataset[idx]['keypoints'])
         transformed_image = transformed['image']
-        transformed_keypoints = np.array(transformed['keypoints'])
+        transformed_keypoints = np.array(transformed['keypoints'])/WIDTH
 
         return {'image': transformed_image, 'keypoints': transformed_keypoints}
+    
 
-@hydra.main(version_base=None, config_path=".", config_name="transform.yaml")
+
+"""@hydra.main(version_base=None, config_path=".", config_name="train_transform.yaml")
 def main(cfg):
 
-    transform = hydra.utils.instantiate(cfg)
+    #transform = hydra.utils.instantiate(cfg)
 
-    ds = TransformedDlib(Dlib(), transform)
+    #ds = TransformedDlib(Dlib(), transform)
 
+    #Dlib.testImage(ds[12]['image'])
 
-    Dlib.show_keypoints(ds[12]['image'], ds[12]['keypoints'])
+    #Dlib.show_keypoints(ds[4]['image'], ds[4]['keypoints'])
+    print(cfg)
+  
 
-    #print(transform['compose'])
 
 if __name__ == "__main__":
     main()
-
-
+"""
 
 
