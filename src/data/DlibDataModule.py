@@ -4,16 +4,22 @@ from PIL import Image
 from typing import Any, Dict, Optional, Tuple
 import fsspec
 import hydra
+from matplotlib import pyplot as plt
 from omegaconf import DictConfig, OmegaConf
 import pyrootutils
 from torchvision.datasets.folder import is_image_file
 from tqdm import tqdm
 import albumentations as A
 
+from torchvision import utils
+
 import torch
 from lightning import LightningDataModule
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
 from torchvision.transforms import transforms
+from hydra import compose, initialize
+
+
 
 pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
@@ -52,9 +58,9 @@ class DlibDataModule(LightningDataModule):
     def __init__(
         self,
         train_transform: Optional[A.Compose] = None,
-        test_transform: Optional[A.Compose] = None,
-        data_dir: str = "data/",
-        train_val_test_split: Tuple[int, int, int] = (792, 72, 114),
+        val_transform: Optional[A.Compose] = None,
+        data_dir: str = "data/IBUG",
+        train_val_test_split: Tuple[int, int, int] = (0.8, 0.1, 0.1),
         batch_size: int = 32,
         num_workers: int = 0,
         pin_memory: bool = False,
@@ -67,7 +73,7 @@ class DlibDataModule(LightningDataModule):
         self.save_hyperparameters(logger=False)
 
         self.train_transform = train_transform
-        self.test_transform = test_transform
+        self.val_transform = val_transform
 
         self.data_train: Optional[Dataset] = None
         self.data_val: Optional[Dataset] = None
@@ -112,8 +118,8 @@ class DlibDataModule(LightningDataModule):
                 )
 
             self.data_train = TransformedDlib(data_train, self.train_transform)
-            self.data_test = TransformedDlib(data_train, self.data_test)
-            self.data_val = TransformedDlib(data_val)
+            self.data_val = TransformedDlib(data_val, self.val_transform)
+            self.data_test = TransformedDlib(data_test, self.val_transform)
 
     def train_dataloader(self):
         return DataLoader(
@@ -155,19 +161,74 @@ class DlibDataModule(LightningDataModule):
         pass
 
 
+    @staticmethod
+    def drawBatch(batch):
+        #print(f"Batch size: {batch.shape}")
+        
+        mean = [0.485, 0.456, 0.406]   # Assuming RGB images
+        std = [0.229, 0.224, 0.225]
+
+        image_batch, keypoints_batch = batch
+        print(f"Image batch size: {image_batch.shape}")
+        
+        # Convert the tensor to a NumPy array and transpose it to (batch_size, height, width, channels)
+        image_batch = image_batch.numpy().transpose((0, 2, 3, 1))
+
+        print(f"Image batch size: {image_batch.shape}")
+
+        # Denormalize the images
+        image_batch = image_batch * std + mean
+
+
+        
+        fig, axs = plt.subplots(4, 8, figsize=(30, 10))
+
+        for i in range(4):
+            for j in range(8):
+                # Display the image
+                idx = i * 4 + j
+                axs[i][j].imshow(image_batch[idx])
+                axs[i][j].axis('off')
+
+                # Extract keypoints for the current image
+                keypoints = keypoints_batch[idx]
+
+                # Rescale keypoints if necessary (e.g., if they are in a different coordinate system)
+                # keypoints = rescale_keypoints(keypoints)
+
+                # Plot keypoints on the image
+                axs[i][j].scatter(keypoints[:, 0] * 224, keypoints[:, 1] * 224, s=1, c='red')
+
+        plt.show()
+
+
+    
+        """grid = utils.make_grid(batch['image'], padding=2, normalize=True)
+        grid = grid.numpy().transpose((1, 2, 0))
+        plt.imshow(grid)
+        """
+        #plt.axis('off')
+        plt.savefig('batchDrawers.png')
+
+
+
+
+
+
 
 @hydra.main(version_base=None, config_path="../../configs/data", config_name='dlib.yaml')
 def main(cfg : DictConfig):
 
+    #print(OmegaConf.to_yaml(cfg))
 
-    #print(os.getcwd())
+    dataModule = hydra.utils.instantiate(cfg)
+    dataModule.setup()
 
-    print(OmegaConf.to_yaml(cfg))
+    train = dataModule.train_dataloader()
+    batch = next(iter(train))
 
-    #test_transform = hydra.utils.instantiate(cfg[1])
-
-    hydra.utils.instantiate
-
+    DlibDataModule.drawBatch(batch)
+    
     #dm = DlibDataModule(train_transform, test_transform)
 
     #Dlib.show_keypoints(dm.data_train[4]['image'], dm.data_train[4]['keypoints']
@@ -176,4 +237,4 @@ def main(cfg : DictConfig):
 
 
 if __name__ == "__main__":
-    _ = main()
+    main()

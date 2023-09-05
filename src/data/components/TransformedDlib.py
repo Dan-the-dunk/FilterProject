@@ -32,31 +32,28 @@ class TransformedDlib(Dataset):
 
     def __getitem__(self, idx):
         #Actual transform the data 
-     
+
         transformed = self.transform(image= np.array(self.pre_dataset[idx]['image']), keypoints=self.pre_dataset[idx]['keypoints'])
         transformed_image = transformed['image']
         transformed_keypoints = np.array(transformed['keypoints'])/WIDTH
 
-        return {'image': transformed_image, 'keypoints': transformed_keypoints}
+        return transformed_image, transformed_keypoints
     
 
 
-"""@hydra.main(version_base=None, config_path=".", config_name="train_transform.yaml")
+@hydra.main(version_base=None, config_path=".", config_name="test_transform.yaml")
 def main(cfg):
 
-    #transform = hydra.utils.instantiate(cfg)
+    transform = hydra.utils.instantiate(cfg)
 
-    #ds = TransformedDlib(Dlib(), transform)
+    ds = TransformedDlib(Dlib(), transform)
 
-    #Dlib.testImage(ds[12]['image'])
-
-    #Dlib.show_keypoints(ds[4]['image'], ds[4]['keypoints'])
-    print(cfg)
+    Dlib.show_keypoints(ds[0][0], ds[0][1])
   
 
 
 if __name__ == "__main__":
     main()
-"""
+
 
 

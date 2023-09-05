@@ -1,13 +1,12 @@
-_target_: src.data.DlibModule.DlibModule
-data_dir: ${paths.data_dir}
+_target_: src.data.DlibDataModule.DlibDataModule
+# data_dir: ${paths.data_dir}
+data_dir: data/IBUG
 batch_size: 32
-train_val_test_split: [792, 72, 114]
+train_val_test_split: [0.8, 0.1, 0.1]
 num_workers: 0
 pin_memory: False
 
-train_transform:
-  _target_: configs/data/train_transform/default.yaml
-
-val_transform:
-  _target_: configs/data/val_transform/default.yaml
+defaults:
+  - train_transform: default.yaml
+  - val_transform: default.yaml
 
