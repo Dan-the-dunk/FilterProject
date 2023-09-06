@@ -186,7 +186,7 @@ class DlibDataModule(LightningDataModule):
         for i in range(4):
             for j in range(8):
                 # Display the image
-                idx = i * 4 + j
+                idx = (i * 8) + j 
                 axs[i][j].imshow(image_batch[idx])
                 axs[i][j].axis('off')
 
@@ -201,12 +201,6 @@ class DlibDataModule(LightningDataModule):
 
         plt.show()
 
-
-    
-        """grid = utils.make_grid(batch['image'], padding=2, normalize=True)
-        grid = grid.numpy().transpose((1, 2, 0))
-        plt.imshow(grid)
-        """
         #plt.axis('off')
         plt.savefig('batchDrawers.png')
 
