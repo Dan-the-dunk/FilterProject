@@ -12,6 +12,7 @@ from tqdm import tqdm
 import albumentations as A
 
 from torchvision import utils
+from torchvision import models
 
 import torch
 from lightning import LightningDataModule
@@ -23,8 +24,8 @@ from hydra import compose, initialize
 
 pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
-from components.Dlib import Dlib
-from components.TransformedDlib import TransformedDlib
+from src.data.components.Dlib import Dlib
+from src.data.components.TransformedDlib import TransformedDlib
 
 
 
@@ -207,28 +208,27 @@ class DlibDataModule(LightningDataModule):
 
 
 
-
+from lightning import Trainer
 
 
 @hydra.main(version_base=None, config_path="../../configs/data", config_name='dlib.yaml')
 def main(cfg : DictConfig):
 
-    #print(OmegaConf.to_yaml(cfg))
-
     dataModule = hydra.utils.instantiate(cfg)
     dataModule.setup()
 
     train = dataModule.train_dataloader()
-    batch = next(iter(train))
+    #batch = next(iter(train))
 
-    DlibDataModule.drawBatch(batch)
-    
-    #dm = DlibDataModule(train_transform, test_transform)
+    #print(models.list_models)
+    #net = models.get_model("mobilenet_v2", num_classes = 68)
+    net = models.get_model("mobilenet_v2",num_classes=68*2)
 
-    #Dlib.show_keypoints(dm.data_train[4]['image'], dm.data_train[4]['keypoints']
-
-    #print((cfg['train_transform']._target_))
-
+    """batch = next(iter(train)) 
+    images, keypoints = batch
+    pred = net(images)
+    print(pred)"""
+    print(net)
 
 if __name__ == "__main__":
     main()
