@@ -44,13 +44,13 @@ class Dlib(Dataset):
         return len(self.root[2])
     
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int):
         if torch.is_tensor(idx):
             idx = idx.tolist()
         
         img_name = os.path.join(self.root_dir,
                                 self.root[2][idx].attrib['file'])
-        image = Image.open(img_name)
+        image = Image.open(img_name).convert("RGB")
 
         keypoints = []
         for kp in self.root[2][idx][0].iter():

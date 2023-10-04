@@ -24,9 +24,9 @@ class DlibNet(torch.nn.Module):
 
 
 def main():
-    model = DlibNet("mobilenet_v2", (68,2))
+    model = DlibNet("resnet18", (68,2))
     pred = model(torch.rand([1, 3, 224, 224]))
-    print(pred.shape)
+    print(pred.dtype)
 
 
 if __name__ == "__main__":

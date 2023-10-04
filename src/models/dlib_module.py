@@ -6,7 +6,7 @@ import pyrootutils
 import torch
 from lightning import LightningModule
 from torchmetrics import MaxMetric, MeanMetric
-from torchmetrics.classification.accuracy import Accuracy
+from torchmetrics.regression.mae import MeanAbsoluteError as MAE
 
 
 pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
@@ -44,9 +44,9 @@ class DlibModule(LightningModule):
         self.criterion = torch.nn.MSELoss()
 
         # metric objects for calculating and averaging accuracy across batches
-        self.train_acc = Accuracy(task="multilabel", num_labels= 136)
-        self.val_acc = Accuracy(task="multilabel", num_labels= 136)
-        self.test_acc = Accuracy(task="multilabel", num_labels= 136)
+        self.train_acc = MAE()
+        self.val_acc = MAE()
+        self.test_acc = MAE()
 
         # for averaging loss across batches
         self.train_loss = MeanMetric()
@@ -55,6 +55,9 @@ class DlibModule(LightningModule):
 
         # for tracking best so far validation accuracy
         self.val_acc_best = MaxMetric()
+
+        # Optimizer and
+        
 
     def forward(self, x: torch.Tensor):
         return self.net(x)
@@ -70,8 +73,7 @@ class DlibModule(LightningModule):
         x, y = batch
         logits = self.forward(x)
         loss = self.criterion(logits, y)
-        preds = torch.argmax(logits, dim=1)
-        return loss, preds, y
+        return loss, logits, y
 
     def training_step(self, batch: Any, batch_idx: int):
         loss, preds, targets = self.model_step(batch)

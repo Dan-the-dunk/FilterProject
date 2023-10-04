@@ -2,14 +2,21 @@ import albumentations as A
 import hydra
 from matplotlib import pyplot as plt
 import numpy as np
+import pyrootutils
 from torch.utils.data import Dataset, DataLoader
-from .Dlib import Dlib
+
+
+
 from typing import Optional
 from albumentations.pytorch import ToTensorV2
 
+pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
-WIDTH = 224
-LENGTH = 244
+
+from src.data.components.Dlib import Dlib
+
+
+
 
 class TransformedDlib(Dataset):
     
@@ -35,7 +42,8 @@ class TransformedDlib(Dataset):
 
         transformed = self.transform(image= np.array(self.pre_dataset[idx]['image']), keypoints=self.pre_dataset[idx]['keypoints'])
         transformed_image = transformed['image']
-        transformed_keypoints = np.array(transformed['keypoints'])/WIDTH
+        transformed_keypoints = (np.array(transformed['keypoints']) / transformed_image.shape[1:]).astype(np.float32)
+        # shape: (c, h , w)
 
         return transformed_image, transformed_keypoints
     
@@ -48,7 +56,9 @@ def main(cfg):
 
     ds = TransformedDlib(Dlib(), transform)
 
-    Dlib.show_keypoints(ds[0][0], ds[0][1])
+    print(ds[1][1].dtype)
+
+
   
 
 
