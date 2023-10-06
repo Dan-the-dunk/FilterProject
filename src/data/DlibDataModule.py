@@ -63,7 +63,7 @@ class DlibDataModule(LightningDataModule):
         data_dir: str = "data/IBUG",
         train_val_test_split: Tuple[int, int, int] = (0.8, 0.1, 0.1),
         batch_size: int = 32,
-        num_workers: int = 0,
+        num_workers: int = 8,
         pin_memory: bool = False,
         
     ):
@@ -222,13 +222,14 @@ def main(cfg : DictConfig):
 
     #print(models.list_models)
     #net = models.get_model("mobilenet_v2", num_classes = 68)
-    net = models.get_model("mobilenet_v2",num_classes=68*2)
 
-    """batch = next(iter(train)) 
+    batch = next(iter(train)) 
     images, keypoints = batch
-    pred = net(images)
+    """pred = net(images)
     print(pred)"""
-    print(net)
+    
+    DlibDataModule.drawBatch(batch=batch)
+    #print(net)
 
 if __name__ == "__main__":
     main()

@@ -53,14 +53,10 @@ class TransformedDlib(Dataset):
 def main(cfg):
 
     transform = hydra.utils.instantiate(cfg)
-
     ds = TransformedDlib(Dlib(), transform)
-
-    print(ds[1][1].dtype)
-
-
-  
-
+    
+    print(ds[1][1])
+    
 
 if __name__ == "__main__":
     main()

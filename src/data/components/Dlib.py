@@ -3,7 +3,6 @@ import os
 import zipfile
 from matplotlib.patches import Rectangle
 import torch
-import pandas as pd
 #from skimage import io, transform
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,13 +19,13 @@ class Dlib(Dataset):
     """Face keypoints dataset."""
 
 
-    def __init__(self, root_dir= r'data\IBUG\ibug_300W_large_face_landmark_dataset'):
+    def __init__(self, root_dir= r'data/ibug_300W_large_face_landmark_dataset'):
         """
         Arguments:
             xml_file (string): Path to the xml file with annotations.
             root_dir (string): Directory with all the images.
         """
-        xml_path = r'data\IBUG\ibug_300W_large_face_landmark_dataset\labels_ibug_300W.xml'
+        xml_path = r'data/ibug_300W_large_face_landmark_dataset/labels_ibug_300W.xml'
         #Download the damn file from the net bro
         if(not ET.parse(xml_path)):
             #download
